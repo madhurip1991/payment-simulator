@@ -1,78 +1,78 @@
-# Payment Simulator – Simple README
+# Payment Simulator Service
 
-This is a Spring Boot application that exposes a single API to simulate a payment.  
-Below are the steps to run the application and the example curl command to test the API.
-
----
-
-## 🚀 How to Run the Application
-
-### **1. Prerequisites**
-- Java 17 or above  
-- Maven 3.8+  
+This project provides a **Payment Simulator API** based on OpenAPI 3.1.0 specification. It allows you to simulate payment requests.
 
 ---
 
-### **2. Build the Project**
+## **Base URL**
+
+```
+http://localhost:8081
+```
+
+---
+
+## **How to Run the Application**
+
+### 1. **Clone the repository**
+
+```bash
+git clone <your-repo-url>
+cd <your-repo-folder>
+```
+
+### 2. **Build the project**
+
+If it’s a Spring Boot Java application:
+
+```bash
+./mvnw clean install
+```
+
+or
 
 ```bash
 mvn clean install
 ```
 
----
-
-### **3. Run the Application**
+### 3. **Run the application**
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
-The application will start at:
+or
 
+```bash
+java -jar target/<your-jar-name>.jar
 ```
-http://localhost:8080
-```
+
+The service will start on **`http://localhost:8081`**.
 
 ---
 
-# 🧪 API Documentation (from OpenAPI)
+## **API Endpoints**
 
-## ✅ **POST /api/payments/simulate**  
-Simulates a payment and returns a response string.
+### 1. **Simulate Payment**
 
-### **Request Body (JSON)**
+```
+POST /api/payments/simulate
+```
+
+**Description:** Simulates a payment for a booking.
+
+**Request Body:**
 
 ```json
 {
-  "bookingId": "e7b92c4e-4d8f-4c4f-99d9-41b2c542fb70",
-  "amountPaid": 500.0
+  "bookingId": "uuid-of-booking",
+  "amountPaid": 1000.50
 }
 ```
 
-### **Fields**
-| Field       | Type    | Required | Description |
-|-------------|---------|----------|-------------|
-| `bookingId` | string (UUID) | Yes | Booking identifier |
-| `amountPaid` | number | Yes | Amount paid by user |
+**Response:** `200 OK`
 
----
-
-# 📌 Example cURL Command
-
-### **Simulate Payment**
-
-```bash
-curl -X POST "http://localhost:8080/api/payments/simulate" \
--H "Content-Type: application/json" \
--d '{
-  "bookingId": "e7b92c4e-4d8f-4c4f-99d9-41b2c542fb70",
-  "amountPaid": 500.0
-}'
-```
-
----
-
-# 🎯 Response (200 OK)
+Example response:
 
 ```
 "Payment simulated successfully"
@@ -80,5 +80,42 @@ curl -X POST "http://localhost:8080/api/payments/simulate" \
 
 ---
 
-## ✔ Notes
-- This README was auto-generated from your OpenAPI.
+## **Example curl Commands**
+
+### 1. **Simulate a Payment**
+
+```bash
+curl -X POST "http://localhost:8081/api/payments/simulate" \
+-H "Content-Type: application/json" \
+-d '{
+  "bookingId": "123e4567-e89b-12d3-a456-426614174000",
+  "amountPaid": 1500.75
+}'
+```
+
+---
+
+### 2. **Test via Webhook (if webhook URL is needed)**
+
+You can send a POST request to the service to simulate webhook events:
+
+```bash
+curl -X POST "http://localhost:8081/api/payments/simulate" \
+-H "Content-Type: application/json" \
+-d '{
+  "bookingId": "123e4567-e89b-12d3-a456-426614174000",
+  "amountPaid": 2000
+}'
+```
+
+> The service will respond with a message confirming the payment simulation.
+
+---
+
+## **Notes**
+
+* Ensure the server is running before making requests.
+* `bookingId` must be a valid UUID string.
+* `amountPaid` should be a numeric value (double).
+
+
