@@ -5,15 +5,13 @@ import com.pay.payment_simulator.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,15 +32,15 @@ public class PaymentSimulatorService {
         payload.put("transactionId", transactionId);
         payload.put("bookingId", paymentInputDTO.bookingId());
         payload.put("amountPaid", paymentInputDTO.amountPaid());
-        payload.put("paymentTime", Instant.now());
+        payload.put("paymentTime", LocalDateTime.now());
 
         logger.info("Simulating payment: transactionId={}, bookingId={}, amountPaid={}",
                 transactionId, paymentInputDTO.bookingId(), paymentInputDTO.amountPaid());
 
         String jwtToken= JwtUtil.generateToken("payment-simulator");
 
-        webClient.post()
-                .uri("/api/payments/**")
+        String result = webClient.post()
+                .uri("/webhooks/payments")
                 .header("Authorization", "Bearer " + jwtToken)
                 .bodyValue(payload)
                 .retrieve()
@@ -54,9 +52,9 @@ public class PaymentSimulatorService {
                                 ((WebClientResponseException) throwable).getStatusCode().is5xxServerError()))
                 .doOnSuccess(response -> logger.info("Webhook sent successfully for transactionId={}", transactionId))
                 .doOnError(error -> logger.error("Failed to send webhook for transactionId={}", transactionId, error))
-                .subscribe();
+                        .block();
 
 
-        return "Payment simulation done and webhook sent.";
+        return "Payment simulation triggered. Webhook Response : "+result;
     }
 }
